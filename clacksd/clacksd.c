@@ -1,6 +1,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <signal.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,52 +16,19 @@
 
 sigset_t mask;
 
-extern int lockfile(int);
+// extern int lockfile(int);
 
-int main(int argc, char *argv[]) {
-  int              err;
-  pthread_t        tid;
-  char             *cmd;
-  struct sigaction *sa;
+err_quit(const char *fmt, ...)
+{
+  va_list args;
 
-  if ((cmd = strrchr(argv[0], '/')) == NULL) {
-    cmd = argv[0];
-  } else {
-    cmd++;
-  }
-
-  /* Daemonize */
-  daemonize(cmd);
-
-  /* Ensure we're the only daemon running */
-  if (already_running()) {
-    syslog(LOG_ERR, "daemon already running");
-    exit(1);
-  }
-
-  /* Block all signals and setup handler */
-  sa.sa_handler = SIG_DFL;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = 0;
-  if (sigaction(SIGHUP, &sa, NULL) < 0) {
-    err_quit("%s: can't restore SIGHUP default", cmd);
-  }
-  sigfillset(&mask);
-  if ((err = pthread_sigmask(SIG_BLOCK, &mask, NULL)) != 0) {
-    err_exit(err, "SIG_BLOCK error");
-  }
-
-  /* Create a thread to handle signals */
-  err = pthread_create(&tid, NULL, sig_handler, 0);
-  if (err != 0) {
-    err_exit(err, "can't create thread!");
-  }
-
-  /* DO IMPORTANT THINGS */
-  exit(0);
+  va_start(args, fmt);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+  exit(EXIT_FAILURE);
 }
 
-void reread(void) {
+reread(void) {
   /* Re-read config */
 }
 
@@ -97,14 +66,14 @@ int already_running(void) {
     syslog(LOG_ERR, "can't open %s: %s", LOCKFILE, strerror(errno));
     exit(1);
   }
-  if (lockfile(fd) < 0) {
-    if (errno == EACCES || errn == EAGAIN) {
-      close(fd);
-      return(1);
-    }
-    syslog(LOG_ERR, "can't lock %s: %s", LOCKFILE, strerror(errno));
-    exit(1);
-  }
+  //if (lockfile(fd) < 0) {
+  //  if (errno == EACCES || errno == EAGAIN) {
+  //    close(fd);
+  //    return(1);
+  //  }
+  //  syslog(LOG_ERR, "can't lock %s: %s", LOCKFILE, strerror(errno));
+  //  exit(1);
+  //}
   ftruncate(fd, 0);
   sprintf(buf, "%ld", (long)getpid());
   write(fd, buf, strlen(buf) + 1);
@@ -162,4 +131,47 @@ void daemonize(const char *cmd) {
     syslog(LOG_ERR, "unexpected file descriptors %d %d %d", fd0, fd1, fd2);
     exit(1);
   }
+}
+
+int main(int argc, char *argv[]) {
+  int              err;
+  pthread_t        tid;
+  char             *cmd;
+  struct sigaction *sa;
+
+  if ((cmd = strrchr(argv[0], '/')) == NULL) {
+    cmd = argv[0];
+  } else {
+    cmd++;
+  }
+
+  /* Daemonize */
+  daemonize(cmd);
+
+  /* Ensure we're the only daemon running */
+  if (already_running()) {
+    syslog(LOG_ERR, "daemon already running");
+    exit(1);
+  }
+
+  /* Block all signals and setup handler */
+  sa->sa_handler = SIG_DFL;
+  sigemptyset(&sa->sa_mask);
+  sa->sa_flags = 0;
+  if (sigaction(SIGHUP, sa, NULL) < 0) {
+    err_quit("%s: can't restore SIGHUP default", cmd);
+  }
+  sigfillset(&mask);
+  if ((err = pthread_sigmask(SIG_BLOCK, &mask, NULL)) != 0) {
+    err_quit("SIG_BLOCK error");
+  }
+
+  /* Create a thread to handle signals */
+  err = pthread_create(&tid, NULL, sig_handler, 0);
+  if (err != 0) {
+    err_quit("can't create thread!");
+  }
+
+  /* DO IMPORTANT THINGS */
+  exit(0);
 }
