@@ -1,0 +1,45 @@
+#! /bin/bash
+
+VERBOSE=0
+CLEAN=0
+
+do_clean ()
+{
+  cd ../
+  rm -rf build
+  mkdir build
+  cd build
+  ln -s ../.build .build
+}
+
+echo "*********************"
+echo "BUILDING CLACKS!"
+echo "*********************"
+
+while getopts "vc" opt; do
+  case "$opt" in
+    v)
+     VERBOSE=1
+     ;;
+    c)
+     CLEAN=1
+     ;;
+  esac
+done
+
+if [ $CLEAN -eq 1 ]
+  then
+    do_clean
+fi
+
+echo "Running CMake..."
+cmake -G "Unix Makefiles" ..
+
+echo "Running make..."
+if [ $VERBOSE -eq 1 ]
+  then
+    make VERBOSE=1
+else
+    make
+fi
+
