@@ -17,6 +17,12 @@
 #define LOCKFILE "/var/run/clacksd.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 
+#ifdef CLACKS_DEBUG
+#define cl_debug(x) syslog(LOG_INFO, x)
+#else
+#define cl_debug(x) do {} while (0)
+#endif
+
 sigset_t mask;
 
 // extern int lockfile(int);
