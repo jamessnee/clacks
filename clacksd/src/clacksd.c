@@ -124,12 +124,19 @@ void daemonize(const char *cmd) {
     err_quit("%s: can't change directory to /", cmd);
   }
 
+/*
+  printf("Setting rlimit\n");
   if (r1.rlim_max == RLIM_INFINITY) {
     r1.rlim_max = 1024;
   }
+  printf("Closing all fds\n");
   for (i = 0; i < r1.rlim_max; i++) {
     close(i);
   }
+*/
+  close(0);
+  close(1);
+  close(2);
 
   fd0 = open("/dev/null", O_RDWR);
   fd1 = dup(0);
@@ -147,7 +154,7 @@ int main(int argc, char *argv[]) {
   pthread_t        sig_tid;
   pthread_t        disc_tid;
   char             *cmd;
-  struct sigaction *sa;
+  struct sigaction sa;
 
   if ((cmd = strrchr(argv[0], '/')) == NULL) {
     cmd = argv[0];
@@ -159,16 +166,18 @@ int main(int argc, char *argv[]) {
   daemonize(cmd);
 
   /* Ensure we're the only daemon running */
+  cl_debug("Checking for single instance");
   if (already_running()) {
     syslog(LOG_ERR, "daemon already running");
     exit(1);
   }
 
   /* Block all signals and setup handler */
-  sa->sa_handler = SIG_DFL;
-  sigemptyset(&sa->sa_mask);
-  sa->sa_flags = 0;
-  if (sigaction(SIGHUP, sa, NULL) < 0) {
+  cl_debug("Setting up signal handlers");
+  sa.sa_handler = SIG_DFL;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  if (sigaction(SIGHUP, &sa, NULL) < 0) {
     err_quit("%s: can't restore SIGHUP default", cmd);
   }
   sigfillset(&mask);
@@ -177,17 +186,20 @@ int main(int argc, char *argv[]) {
   }
 
   /* Create a thread to handle signals */
+  cl_debug("Creating signal handling thread");
   err = pthread_create(&sig_tid, NULL, sig_handler, 0);
   if (err != 0) {
     err_quit("can't create signal thread!");
   }
 
   /* Start a discovery thread */
+  cl_debug("Starting a discovery thread");
   err = pthread_create(&disc_tid, NULL, start_discovery, 0);
   if (err != 0) {
     err_quit("can't create discovery thread!");
   }
 
+  cl_debug("Done with main setup, continuing");
   for (;;) {
     continue;
   }
