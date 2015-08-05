@@ -11,6 +11,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "clacks_common.h"
+#include "transport-server/cl_discovery_thread.h"
+
 #define LOCKFILE "/var/run/clacksd.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 
@@ -127,7 +130,7 @@ void daemonize(const char *cmd) {
   fd2 = dup(0);
 
   openlog(cmd, LOG_CONS, LOG_DAEMON);
-  if (fd0 != 0 || fd1 != 0|| fd2 != 0) {
+  if (fd0 != 0 || fd1 != 1|| fd2 != 2) {
     syslog(LOG_ERR, "unexpected file descriptors %d %d %d", fd0, fd1, fd2);
     exit(1);
   }
@@ -135,7 +138,8 @@ void daemonize(const char *cmd) {
 
 int main(int argc, char *argv[]) {
   int              err;
-  pthread_t        tid;
+  pthread_t        sig_tid;
+  pthread_t        disc_tid;
   char             *cmd;
   struct sigaction *sa;
 
@@ -167,9 +171,19 @@ int main(int argc, char *argv[]) {
   }
 
   /* Create a thread to handle signals */
-  err = pthread_create(&tid, NULL, sig_handler, 0);
+  err = pthread_create(&sig_tid, NULL, sig_handler, 0);
   if (err != 0) {
-    err_quit("can't create thread!");
+    err_quit("can't create signal thread!");
+  }
+
+  /* Start a discovery thread */
+  err = pthread_create(&disc_tid, NULL, start_discovery, 0);
+  if (err != 0) {
+    err_quit("can't create discovery thread!");
+  }
+
+  for (;;) {
+    continue;
   }
 
   /* DO IMPORTANT THINGS */
