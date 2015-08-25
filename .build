@@ -43,8 +43,11 @@ if [ $CLEAN -eq 1 ]
     do_clean
 fi
 
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+
 echo "Running CMake..."
-cmake -G "Unix Makefiles" ..
+cmake -D_CMAKE_TOOLCHAIN_PREFIX=llvm- -G "Unix Makefiles" ..
 
 echo "Running make..."
 if [ $VERBOSE -eq 1 ]
