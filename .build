@@ -56,9 +56,3 @@ if [ $VERBOSE -eq 1 ]
 else
     make
 fi
-
-if [ $CLEAN -eq 1 ]
-  then
-    echo "MOVING"
-    cd ..
-fi
