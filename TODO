@@ -1,3 +1,8 @@
 * Add message (de-)serialization framework -- probably:
 https://github.com/protobuf-c/protobuf-c
 
+* Use a C block in the discovery code. When calling the discovery function, the
+thread origin function passes over a block that defines the action to be taken
+when a discovery message is received.
+  * Makes it more portable.
+  * Is cool...
