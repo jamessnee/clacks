@@ -5,10 +5,12 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include "clacks_common.h"
+
 #include "cl_discovery.h"
 
 #define CL_DISCOVER_PORT 12344
-#define CL_DISCOVER_BUFF_S 2048
+#define CL_DISCOVER_BUFF_S sizeof(struct CL_Discovery_Transport)
 
 int wait_for_transport(struct CL_Discovery_Transport *disc_transport) {
   struct sockaddr_in localaddr;
@@ -33,8 +35,15 @@ int wait_for_transport(struct CL_Discovery_Transport *disc_transport) {
     return 1;
   }
 
+  syslog(LOG_INFO, "Discovery socket bound. Waiting for messages");
   recvlen = recvfrom(fd, buf, CL_DISCOVER_BUFF_S, 0, (struct sockaddr *)&remoteaddr, &addrlen);
-  printf("Discovery: Recieved %d bytes\n", recvlen);
+
+  // Check we received a whole discovery message
+  if (recvlen != CL_DISCOVER_BUFF_S) {
+    syslog(LOG_ERR, "Received a discovery message that was of the wrong size. Dropping");
+    return 1;
+  }
+
   close(fd);
   return 0;
 }
