@@ -6,3 +6,5 @@ thread origin function passes over a block that defines the action to be taken
 when a discovery message is received.
   * Makes it more portable.
   * Is cool...
+  * http://stackoverflow.com/questions/5907071/clang-block-in-linux
+    * _Just_ need to ensure the blocks runtime is in place
