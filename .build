@@ -12,17 +12,28 @@ do_clean ()
   ln -s ../.build .build
 }
 
+print_help ()
+{
+  echo "Need help eh...?"
+  echo "-v -- Verbose building"
+  echo "-c -- Clean before building"
+}
+
 echo "*********************"
 echo "BUILDING CLACKS!"
 echo "*********************"
 
-while getopts "vc" opt; do
+while getopts "vch" opt; do
   case "$opt" in
     v)
      VERBOSE=1
      ;;
     c)
      CLEAN=1
+     ;;
+    h)
+     print_help
+     exit
      ;;
   esac
 done
@@ -43,3 +54,8 @@ else
     make
 fi
 
+if [ $CLEAN -eq 1 ]
+  then
+    echo "MOVING"
+    cd ..
+fi
