@@ -1,0 +1,3 @@
+* Add message (de-)serialization framework -- probably:
+https://github.com/protobuf-c/protobuf-c
+
