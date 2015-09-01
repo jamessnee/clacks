@@ -1,0 +1,9 @@
+message Discovery {
+  enum Transport {
+    SOCKETS    = 0;
+    DOMSOCKETS = 1;
+  }
+
+  required string clientName = 1;
+  required Transport supportedTransport = 2;
+}
