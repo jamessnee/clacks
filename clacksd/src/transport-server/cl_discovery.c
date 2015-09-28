@@ -4,6 +4,7 @@
 #include <syslog.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "clacks_common.h"
 
