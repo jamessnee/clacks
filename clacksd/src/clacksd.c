@@ -27,7 +27,7 @@ sigset_t mask;
 
 // extern int lockfile(int);
 
-err_quit(const char *fmt, ...)
+void err_quit(const char *fmt, ...)
 {
   va_list args;
 
@@ -37,7 +37,7 @@ err_quit(const char *fmt, ...)
   exit(EXIT_FAILURE);
 }
 
-reread(void) {
+void reread(void) {
   /* Re-read config */
 }
 
@@ -95,8 +95,6 @@ void daemonize(const char *cmd) {
   struct rlimit    r1;
   struct sigaction sa;
 
-  umask(0);
-
   if (getrlimit(RLIMIT_NOFILE, &r1) < 0) {
     err_quit("%s: can't get file limit", cmd);
   }
@@ -106,6 +104,8 @@ void daemonize(const char *cmd) {
   } else if (pid != 0){
     exit(0);
   }
+
+  umask(0);
   setsid();
 
   sa.sa_handler = SIG_IGN;
