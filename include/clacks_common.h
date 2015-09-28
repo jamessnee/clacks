@@ -1,6 +1,8 @@
 #ifndef CLACKS_COMMON_H
 #define CLACKS_COMMON_H
 
+#define CL_ID_DOM_SOCKET "/var/run/clacksid.sock"
+
 typedef enum {
   cl_socket,
   cl_domain_socket
