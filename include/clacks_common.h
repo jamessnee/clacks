@@ -2,6 +2,8 @@
 #define CLACKS_COMMON_H
 
 #define CL_ID_DOM_SOCKET "/var/run/clacksid.sock"
+#define CL_ID_GET "GET"
+#define CL_ID_TAG "TAG"
 
 typedef enum {
   cl_socket,

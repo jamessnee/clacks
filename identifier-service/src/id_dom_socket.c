@@ -1,11 +1,40 @@
+#include "clacks_common.h"
+#include "id_generator.h"
+#include <errno.h>
 #include <syslog.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "id_dom_socket.h"
+
+void parse_message(char *buf) {
+  syslog(LOG_INFO, "Message: %s\n", buf);
+}
+
+int send_uuid(int sock_con) {
+  char uuid[37];
+
+  next_uuid(uuid);
+  return write(sock_con, uuid, sizeof(uuid));
+}
+
+void handle_connection(int sock_con) {
+  int read_val;
+  char buf[1024];
+  if ((read_val = read(sock_con, buf, 1024)) < 0) {
+    syslog(LOG_ERR, "clacksidd: Couldn't read from dom socket: %d", errno);
+  } else if (strcmp(buf, CL_ID_GET) == 0) {
+    if (send_uuid(sock_con) != 0) {
+      syslog(LOG_ERR, "Problem sending UUID");
+    }
+  } else if (strcmp(buf, CL_ID_TAG) == 0) {
+    syslog(LOG_INFO, "Got a TAG message");
+  }
+}
 
 int listen_on_dom_socket(char *sock_path) {
   int dom_sock, sock_msg;
@@ -23,20 +52,27 @@ int listen_on_dom_socket(char *sock_path) {
     goto error;
   }
 
-  listen(dom_sock, 5); // TODO: Change this queue length to a parameter
+  if (listen(dom_sock, 5) != 0) {
+    syslog(LOG_ERR, "clacksidd: Couldn't listen on socket: %d", errno);
+    goto error;
+  }
+
   for (;;) {
-    sock_msg = accept(dom_sock, 0, 0);
-    if (sock_msg == -1) {
-      syslog(LOG_ERR, "clacksidd: Couldn't accept incoming connection");
+    int server_sock_len = sizeof(server);
+    sock_msg = accept(dom_sock, (struct sockaddr *) &server, (socklen_t *)&server_sock_len);
+    if (sock_msg < 0) {
+      syslog(LOG_ERR, "clacksidd: Couldn't accept incoming connection: %d", errno);
       goto error;
-    } else {
-      // Read the incoming message
     }
+    handle_connection(sock_msg);
+    close(sock_msg);
   }
 
 error:
   close(dom_sock);
   unlink(sock_path);
+  syslog(LOG_ERR, "clacksidd: socket closed, file unlinked");
   return -1;
 
 }
+

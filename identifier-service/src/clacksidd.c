@@ -1,4 +1,5 @@
 #include "id_dom_socket.h"
+#include "id_generator.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
@@ -193,6 +194,7 @@ int main(int argc, char *argv[]) {
   }
 
   cl_debug("clacksidd: Done with main setup, continuing");
+  update_uuid_pool();
   rtn = listen_on_dom_socket(CL_ID_DOM_SOCKET);
 
   exit(0);

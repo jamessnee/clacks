@@ -6,6 +6,6 @@
 #define CL_MAX_FREE_UUIDS 128
 
 void update_uuid_pool(void);
-void next_uuid(uuid_t uuid);
+void next_uuid(char *);
 
 #endif

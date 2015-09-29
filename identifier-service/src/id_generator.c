@@ -12,11 +12,11 @@ void update_uuid_pool(void) {
   uuid_list_hd = CL_MAX_FREE_UUIDS;
 }
 
-void next_uuid(uuid_t uuid) {
+void next_uuid(char *out) {
   if (uuid_list_hd == -1) {
     update_uuid_pool();
   }
 
-  uuid = uuid_list[uuid_list_hd];
+  uuid_unparse(uuid_list[uuid_list_hd], out);
   uuid_list_hd--;
 }
