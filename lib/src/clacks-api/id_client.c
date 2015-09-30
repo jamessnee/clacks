@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "id_client.h"
@@ -13,6 +14,7 @@ static struct sockaddr_un server;
 
 int get_new_id(char *id) {
   int ret;
+  char buf[1024];
 
   if (dom_sock == -1) {
     // Setup a new domain socket
@@ -41,13 +43,15 @@ int get_new_id(char *id) {
     return -1;
   }
 
-  ret = read(dom_sock, id, sizeof(id)); // TODO: wrap this into an id struct (better size checking)
+  ret = read(dom_sock, buf, sizeof(buf)); // TODO: wrap this into an id struct (better size checking)
   if (ret < 0) {
     fprintf(stderr, "libclacks: Error reading from dom socket: %d\n", errno);
     close(dom_sock);
     dom_sock = -1;
     return -1;
   }
+
+  memcpy(id, buf, sizeof(buf));
 
   return 0;
 }
