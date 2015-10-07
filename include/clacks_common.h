@@ -1,7 +1,8 @@
 #ifndef CLACKS_COMMON_H
 #define CLACKS_COMMON_H
 
-#define CL_ID_DOM_SOCKET "/var/run/clacksid.sock"
+#define CL_DOM_DIR "/var/run/clacks/"
+#define CL_ID_DOM_SOCKET CL_DOM_DIR "clacksid.sock"
 #define CL_ID_GET "GET"
 #define CL_ID_TAG "TAG"
 
