@@ -13,6 +13,7 @@ set (CLACKSD_SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/clacksd.c
   ${CMAKE_CURRENT_SOURCE_DIR}/src/transport-server/cl_discovery.c
   ${CMAKE_CURRENT_SOURCE_DIR}/src/transport-server/cl_discovery_thread.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/transport-server/cl_transport_domsock.c
   ${generated_transports_SRC}
   ${generated_transports_SRC})
 
