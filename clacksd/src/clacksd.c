@@ -13,15 +13,10 @@
 
 #include "clacks_common.h"
 #include "transport-server/cl_discovery_thread.h"
+#include "transport-server/cl_transport_domsock.h"
 
 #define LOCKFILE "/var/run/clacksd.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
-
-#ifdef CLACKS_DEBUG
-#define cl_debug(x) syslog(LOG_INFO, x)
-#else
-#define cl_debug(x) do {} while (0)
-#endif
 
 sigset_t mask;
 
@@ -153,6 +148,7 @@ int main(int argc, char *argv[]) {
   int              err;
   pthread_t        sig_tid;
   pthread_t        disc_tid;
+  pthread_t        dom_transp_tid;
   char             *cmd;
   struct sigaction sa;
 
@@ -197,6 +193,13 @@ int main(int argc, char *argv[]) {
   err = pthread_create(&disc_tid, NULL, start_discovery, 0);
   if (err != 0) {
     err_quit("can't create discovery thread!");
+  }
+
+  /* Start a domain socket thread */
+  cl_debug("Starting the domain socket thread");
+  err = pthread_create(&dom_transp_tid, NULL, start_transport, 0);
+  if (err != 0) {
+    cl_debug("Couldn't start the domain socket thread");
   }
 
   cl_debug("Done with main setup, continuing");

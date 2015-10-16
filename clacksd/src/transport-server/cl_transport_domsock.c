@@ -1,5 +1,6 @@
 #include "clacks_common.h"
 #include <errno.h>
+#include <pthread.h>
 #include <syslog.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -32,18 +33,18 @@ void init_transport(/* Add storage struct here */) {
   /* Save the storage -- init it */
 }
 
-void start_transport() {
+void * start_transport(void *args) {
   int dom_sock, sock_msg;
   struct sockaddr_un server;
 
   if (!check_dom_dir(CL_TRANSPORT_DOM_SOCKET)) {
     syslog(LOG_ERR, "clacks_transport_dom: Couldn't create domain socket directory");
-    return;
+    goto exit;
   }
 
   dom_sock = socket(AF_UNIX, SOCK_STREAM, 0);
   if(dom_sock < 0) {
-    return;
+    goto exit;
   }
   server.sun_family = AF_UNIX;
   strcpy(server.sun_path, CL_TRANSPORT_DOM_SOCKET);
@@ -57,6 +58,7 @@ void start_transport() {
     goto error;
   }
 
+  cl_debug("Domain socket transport open and ready...");
   for (;;) {
     int server_sock_len = sizeof(server);
     sock_msg = accept(dom_sock, (struct sockaddr *)&server, (socklen_t *)&server_sock_len);
@@ -71,5 +73,8 @@ error:
   close(dom_sock);
   unlink(CL_TRANSPORT_DOM_SOCKET);
   syslog(LOG_ERR, "clacks_transport_dom: socket closed, file unlinked");
-  return;
+  goto exit;
+
+exit:
+  pthread_exit(0);
 }

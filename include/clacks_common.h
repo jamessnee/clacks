@@ -7,6 +7,12 @@
 #define CL_ID_GET "GET"
 #define CL_ID_TAG "TAG"
 
+#ifdef CLACKS_DEBUG
+#define cl_debug(x) syslog(LOG_INFO, x)
+#else
+#define cl_debug(x) do {} while (0)
+#endif
+
 typedef enum {
   cl_socket,
   cl_domain_socket
