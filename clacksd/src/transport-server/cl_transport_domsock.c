@@ -25,7 +25,7 @@ int check_dom_dir(char *sock_path) {
   return 1;
 }
 
-void handle_connection(int sock_con) {
+void handle_message(char *rd_buf) {
   /* Receive the message */
 }
 
@@ -34,15 +34,16 @@ void init_transport(/* Add storage struct here */) {
 }
 
 void * start_transport(void *args) {
-  int dom_sock, sock_msg;
+  int dom_sock;
   struct sockaddr_un server;
+  char rd_buf[1024]; // TODO: Change this to a constant
 
   if (!check_dom_dir(CL_TRANSPORT_DOM_SOCKET)) {
     syslog(LOG_ERR, "clacks_transport_dom: Couldn't create domain socket directory");
     goto exit;
   }
 
-  dom_sock = socket(AF_UNIX, SOCK_STREAM, 0);
+  dom_sock = socket(AF_UNIX, SOCK_DGRAM, 0);
   if(dom_sock < 0) {
     goto exit;
   }
@@ -53,20 +54,15 @@ void * start_transport(void *args) {
     goto error;
   }
 
-  if (listen(dom_sock, 5) != 0) {
-    syslog(LOG_ERR, "clacks_transport_dom: Couldn't listen on socket");
-    goto error;
-  }
-
   cl_debug("Domain socket transport open and ready...");
   for (;;) {
-    int server_sock_len = sizeof(server);
-    sock_msg = accept(dom_sock, (struct sockaddr *)&server, (socklen_t *)&server_sock_len);
-    if (sock_msg < 0) {
-      syslog(LOG_ERR, "clacks_transport_dom: Couldn't accept incoming connection: %d", errno);
+    memset(rd_buf, 0, sizeof(rd_buf));
+    if (read(dom_sock, rd_buf, sizeof(rd_buf)) < 0) {
+      syslog(LOG_ERR, "clacks_transport_dom: read error from socket: %d", errno);
+    } else {
+      /* Good read */
+      handle_message(rd_buf);
     }
-    handle_connection(sock_msg);
-    close(sock_msg);
   }
 
 error:
