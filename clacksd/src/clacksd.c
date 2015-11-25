@@ -189,11 +189,13 @@ int main(int argc, char *argv[]) {
   }
 
   /* Start a discovery thread */
+  /*
   cl_debug("Starting a discovery thread");
   err = pthread_create(&disc_tid, NULL, start_discovery, 0);
   if (err != 0) {
     err_quit("can't create discovery thread!");
   }
+  */
 
   /* Start a domain socket thread */
   cl_debug("Starting the domain socket thread");
@@ -204,6 +206,7 @@ int main(int argc, char *argv[]) {
 
   cl_debug("Done with main setup, continuing");
   for (;;) {
+    sleep(60);
     continue;
   }
 

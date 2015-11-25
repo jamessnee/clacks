@@ -1,4 +1,5 @@
 #include "clacks_common.h"
+#include "TraceMessage.pb-c.h"
 #include <errno.h>
 #include <pthread.h>
 #include <syslog.h>
@@ -25,8 +26,17 @@ int check_dom_dir(char *sock_path) {
   return 1;
 }
 
-void handle_message(char *rd_buf) {
-  /* Receive the message */
+void handle_message(const unsigned char *rd_buf, size_t size) {
+  TraceMessage *t_msg;
+  t_msg = trace_message__unpack(NULL, size, rd_buf);
+  if (t_msg == NULL) {
+    syslog(LOG_ERR, "clacks_transport_dom: error unpacking trace message: %d", errno);
+    return;
+  }
+
+  // Message seems to be good
+  syslog(LOG_INFO, "clacks_transport_dom: received: %s", t_msg->msg);
+  trace_message__free_unpacked(t_msg, NULL);
 }
 
 void init_transport(/* Add storage struct here */) {
@@ -36,7 +46,8 @@ void init_transport(/* Add storage struct here */) {
 void * start_transport(void *args) {
   int dom_sock;
   struct sockaddr_un server;
-  char rd_buf[1024]; // TODO: Change this to a constant
+  unsigned char rd_buf[1024]; // TODO: Change this to a constant
+  int recv_size;
 
   if (!check_dom_dir(CL_TRANSPORT_DOM_SOCKET)) {
     syslog(LOG_ERR, "clacks_transport_dom: Couldn't create domain socket directory");
@@ -57,11 +68,13 @@ void * start_transport(void *args) {
   cl_debug("Domain socket transport open and ready...");
   for (;;) {
     memset(rd_buf, 0, sizeof(rd_buf));
-    if (read(dom_sock, rd_buf, sizeof(rd_buf)) < 0) {
+    recv_size = 0;
+    //if (read(dom_sock, rd_buf, sizeof(rd_buf)) < 0) {
+    if ((recv_size = recv(dom_sock, rd_buf, sizeof(rd_buf), MSG_WAITALL)) < 0) {
       syslog(LOG_ERR, "clacks_transport_dom: read error from socket: %d", errno);
     } else {
       /* Good read */
-      handle_message(rd_buf);
+      handle_message(rd_buf, (size_t) recv_size);
     }
   }
 
