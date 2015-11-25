@@ -15,5 +15,9 @@ int main (int argc, char *argv[]) {
     fprintf(stdout, "ID: %s\n", id);
   }
 
+  // Test whether we can send a trace message
+  fprintf(stdout, "Testing tracing\n");
+  clacks_trace_string("DIFFERENT STRING");
+
   return 0;
 }
