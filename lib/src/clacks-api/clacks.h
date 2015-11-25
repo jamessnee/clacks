@@ -9,8 +9,9 @@
  *   0: on success
  *   -1: on error
  */
-int clacks_new_id(char *id);
+int clacks_new_id(char *);
 
-void clacks_trace_string(char *str);
+void clacks_trace_string(char *);
+void clacks_trace_string_id(char *, char *);
 
 #endif

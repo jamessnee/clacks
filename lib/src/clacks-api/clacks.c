@@ -6,7 +6,8 @@
 
 #include "clacks.h"
 
-void clacks_trace_string(char *str) {
+/* API Back-End */
+void _clacks_trace_string_id(char *str, char *id) {
   int ret;
 
   TraceMessage t_msg = TRACE_MESSAGE__INIT;
@@ -15,6 +16,17 @@ void clacks_trace_string(char *str) {
   t_msg.flags = 0;
 
   ret = send_trace_message(&t_msg);
+}
+
+/* API Front-End */
+void clacks_trace_string(char *str) {
+  clacks_trace_string_id(str, "NULLID");
+}
+
+void clacks_trace_string_id(char *str, char *id) {
+  if (str != NULL && id != NULL) {
+    _clacks_trace_string_id(str, id);
+  }
 }
 
 int clacks_new_id(char *id) {
