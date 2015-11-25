@@ -4,12 +4,9 @@ https://github.com/protobuf-c/protobuf-c
 ===============================================================================
 
 * ID Service:
-  * GET
   * TAG
 * Library:
-  * Get IDs
   * Tag IDs
-  * TRACE messages
 * clacksd
   * Record TRACE messages
 * Storage
