@@ -10,6 +10,7 @@ do_clean ()
   mkdir build
   cd build
   ln -s ../.build .build
+  ln -s ../.run .run
 }
 
 print_help ()

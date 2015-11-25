@@ -1,0 +1,4 @@
+#! /bin/bash
+
+sudo ./identifier-service/clacksidd
+sudo ./clacksd/clacksd
