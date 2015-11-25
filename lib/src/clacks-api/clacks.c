@@ -11,7 +11,7 @@ void _clacks_trace_string_id(char *str, char *id) {
   int ret;
 
   TraceMessage t_msg = TRACE_MESSAGE__INIT;
-  t_msg.act_id = "TEST";
+  t_msg.act_id = id;
   t_msg.msg = str;
   t_msg.flags = 0;
 
