@@ -1,0 +1,16 @@
+== Procol Buffers ==
+Protocol buffers are used to communicate data between the various Clacks
+components.
+Protobuf-C (A C implementation of Protocol Buffers)
+  https://github.com/protobuf-c/protobuf-c
+This library also requires an installation of the Protocol Buffers library.
+
+== CMake ==
+Any up to date version will do.
+
+== libUUID ==
+Should be provided by _most_ good *NIX / Linux distributions.
+
+== Hiredis ==
+Redis C client library.
+  https://github.com/redis/hiredis
