@@ -24,13 +24,13 @@ int send_uuid(int sock_con) {
 }
 
 void handle_connection(int sock_con) {
-  int read_val;
+  int read_val, ret;
   char buf[1024];
   if ((read_val = read(sock_con, buf, 1024)) < 0) {
     syslog(LOG_ERR, "clacksidd: Couldn't read from dom socket: %d", errno);
   } else if (strcmp(buf, CL_ID_GET) == 0) {
-    if (send_uuid(sock_con) != 0) {
-      syslog(LOG_ERR, "Problem sending UUID");
+    if ((ret = send_uuid(sock_con)) <= 0) {
+      syslog(LOG_ERR, "Problem sending UUID: %d", errno);
     }
   } else if (strcmp(buf, CL_ID_TAG) == 0) {
     syslog(LOG_INFO, "Got a TAG message");
