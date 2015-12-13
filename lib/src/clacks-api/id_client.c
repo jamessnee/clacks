@@ -52,6 +52,8 @@ int get_new_id(char *id) {
   }
 
   memcpy(id, buf, sizeof(buf));
+  close(dom_sock);
+  dom_sock = -1;
 
   return 0;
 }
