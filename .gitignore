@@ -34,3 +34,4 @@
 build/
 
 *.pb-c.*
+id_bench_results.txt
