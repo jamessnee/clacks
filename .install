@@ -1,0 +1,4 @@
+#! /bin/bash
+
+cp lib/libclacks.so /usr/local/lib/
+cp ../lib/src/clacks-api/clacks.h /usr/local/include/

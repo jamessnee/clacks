@@ -2,6 +2,8 @@
 
 VERBOSE=0
 CLEAN=0
+INSTALL=0
+RUN=0
 
 do_clean ()
 {
@@ -11,6 +13,17 @@ do_clean ()
   cd build
   ln -s ../.build .build
   ln -s ../.run .run
+  ln -s ../.install .install
+}
+
+do_install ()
+{
+  ./.install
+}
+
+do_run ()
+{
+  ./.run
 }
 
 print_help ()
@@ -18,13 +31,15 @@ print_help ()
   echo "Need help eh...?"
   echo "-v -- Verbose building"
   echo "-c -- Clean before building"
+  echo "-i -- Install the Clacks library (/usr/local/{lib,include})"
+  echo "-r -- Run the Clacks daemon and Identifier Service"
 }
 
 echo "*********************"
 echo "BUILDING CLACKS!"
 echo "*********************"
 
-while getopts "vch" opt; do
+while getopts "vchir" opt; do
   case "$opt" in
     v)
      VERBOSE=1
@@ -35,6 +50,12 @@ while getopts "vch" opt; do
     h)
      print_help
      exit
+     ;;
+    i)
+     INSTALL=1
+     ;;
+    r)
+     RUN=1
      ;;
   esac
 done
@@ -56,4 +77,16 @@ if [ $VERBOSE -eq 1 ]
     make VERBOSE=1
 else
     make
+fi
+
+echo "Installing"
+if [ $INSTALL -eq 1 ]
+  then
+    do_install
+fi
+
+echo "Starting Clacks Services"
+if [ $RUN -eq 1 ]
+  then
+    do_run
 fi
