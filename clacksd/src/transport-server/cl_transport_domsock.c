@@ -35,7 +35,7 @@ void handle_message(const unsigned char *rd_buf, size_t size) {
   }
 
   // Message seems to be good
-  syslog(LOG_INFO, "clacks_transport_dom: received: %s", t_msg->msg);
+  syslog(LOG_INFO, "clacks_transport_dom: received: ID: %s :: %s", t_msg->act_id, t_msg->msg);
   trace_message__free_unpacked(t_msg, NULL);
 }
 
