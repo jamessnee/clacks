@@ -71,22 +71,22 @@ export CXX=/usr/bin/clang++
 echo "Running CMake..."
 cmake -D_CMAKE_TOOLCHAIN_PREFIX=llvm- -G "Unix Makefiles" ..
 
-echo "Running make..."
 if [ $VERBOSE -eq 1 ]
   then
+    echo "Running make..."
     make VERBOSE=1
 else
     make
 fi
 
-echo "Installing"
 if [ $INSTALL -eq 1 ]
   then
+    echo "Installing"
     do_install
 fi
 
-echo "Starting Clacks Services"
 if [ $RUN -eq 1 ]
   then
+    echo "Starting Clacks Services"
     do_run
 fi
