@@ -1,31 +1,48 @@
+#define _GNU_SOURCE
 #include "clacks_common.h"
+#include "../transport-client/cl_transport_domsock_client.h"
 #include "id_client.h"
 #include "TraceMessage.pb-c.h"
-#include "../transport-client/cl_transport_domsock_client.h"
 #include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
 
 #include "clacks.h"
 
 /* API Back-End */
-void _clacks_trace_string_id(char *str, char *id) {
+void _clacks_trace_id_string(char *id, char *str, va_list args) {
   int ret;
+  char *msg;
 
-  TraceMessage t_msg = TRACE_MESSAGE__INIT;
-  t_msg.act_id = id;
-  t_msg.msg = str;
-  t_msg.flags = 0;
+  // Prepare the message
+  ret = vasprintf(&msg, str, args);
+  if (ret >= 0) {
+    TraceMessage t_msg = TRACE_MESSAGE__INIT;
+    t_msg.act_id = id;
+    t_msg.msg = msg;
+    t_msg.flags = 0;
 
-  ret = send_trace_message(&t_msg);
+    ret = send_trace_message(&t_msg);
+  }
+  free(msg);
 }
 
 /* API Front-End */
-void clacks_trace_string(char *str) {
-  clacks_trace_string_id(str, "NULLID");
+void clacks_trace_string(char *str, ...) {
+  if (str != NULL) {
+    va_list args;
+    va_start(args, str);
+    _clacks_trace_id_string("NULLID", str, args);
+    va_end(args);
+  }
 }
 
-void clacks_trace_string_id(char *str, char *id) {
+void clacks_trace_id_string(char *id, char *str, ...) {
   if (str != NULL && id != NULL) {
-    _clacks_trace_string_id(str, id);
+    va_list args;
+    va_start(args, str);
+    _clacks_trace_id_string(id, str, args);
+    va_end(args);
   }
 }
 

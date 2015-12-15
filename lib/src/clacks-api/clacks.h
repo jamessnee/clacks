@@ -11,7 +11,7 @@
  */
 int clacks_new_id(char *);
 
-void clacks_trace_string(char *);
-void clacks_trace_string_id(char *, char *);
+void clacks_trace_string(char *, ...);
+void clacks_trace_id_string(char *, char *, ...);
 
 #endif
