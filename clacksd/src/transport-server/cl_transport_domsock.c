@@ -1,4 +1,5 @@
 #include "clacks_common.h"
+#include "../storage/cl_file_module.h"
 #include "TraceMessage.pb-c.h"
 #include <errno.h>
 #include <pthread.h>
@@ -27,6 +28,7 @@ int check_dom_dir(char *sock_path) {
 }
 
 void handle_message(const unsigned char *rd_buf, size_t size) {
+  int rtn;
   TraceMessage *t_msg;
   t_msg = trace_message__unpack(NULL, size, rd_buf);
   if (t_msg == NULL) {
@@ -35,7 +37,12 @@ void handle_message(const unsigned char *rd_buf, size_t size) {
   }
 
   // Message seems to be good
-  syslog(LOG_INFO, "clacks_transport_dom: received: ID: %s :: %s", t_msg->act_id, t_msg->msg);
+  //syslog(LOG_INFO, "clacks_transport_dom: received: ID: %s :: %s", t_msg->act_id, t_msg->msg);
+  rtn = store_trace_message(t_msg);
+  if (rtn < 0) {
+    syslog(LOG_INFO, "clacks_tranport_dom: error storing trace message: %s", strerror(errno));
+  }
+
   trace_message__free_unpacked(t_msg, NULL);
 }
 
