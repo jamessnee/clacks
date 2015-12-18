@@ -24,7 +24,7 @@ int _store_trace_message(TraceMessage *msg) {
 
   clock_gettime(CLOCK_MONOTONIC, &time);
   // Convert time to ms
-  us = (time.tv_sec * 1000) + (time.tv_nsec / 1000);
+  us = (time.tv_sec * 1000000) + (time.tv_nsec / 1000);
 
   // Construct the output
   rtn = asprintf(&to_write, "%lld||%s||%s\n", us, msg->act_id, msg->msg);
