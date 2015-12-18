@@ -5,11 +5,13 @@ static uuid_t uuid_list[CL_MAX_FREE_UUIDS];
 
 void update_uuid_pool(void) {
   int i;
+  char tmp_uuid[37];
+
   if (uuid_list_hd < 0) uuid_list_hd = 0;
   for (i = uuid_list_hd; i < CL_MAX_FREE_UUIDS; i++) {
     uuid_generate_time_safe(uuid_list[i]);
   }
-  uuid_list_hd = CL_MAX_FREE_UUIDS;
+  uuid_list_hd = CL_MAX_FREE_UUIDS - 1;
 }
 
 void next_uuid(char *out) {
