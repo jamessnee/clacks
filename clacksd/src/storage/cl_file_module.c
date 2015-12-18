@@ -8,6 +8,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "cl_file_module.h"
 
@@ -18,9 +19,15 @@ static int out_file = -1;
 int _store_trace_message(TraceMessage *msg) {
   char *to_write;
   int rtn;
+  struct timespec time;
+  long long us;
+
+  clock_gettime(CLOCK_MONOTONIC, &time);
+  // Convert time to ms
+  us = (time.tv_sec * 1000) + (time.tv_nsec / 1000);
 
   // Construct the output
-  rtn = asprintf(&to_write, "%s||%s\n", msg->act_id, msg->msg);
+  rtn = asprintf(&to_write, "%lld||%s||%s\n", us, msg->act_id, msg->msg);
   if (rtn < 0)
     return rtn;
 
