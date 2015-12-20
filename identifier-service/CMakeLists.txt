@@ -12,6 +12,7 @@ set (CLACKSD_SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/clacksidd.c
   ${CMAKE_CURRENT_SOURCE_DIR}/src/id_generator.c
   ${CMAKE_CURRENT_SOURCE_DIR}/src/id_dom_socket.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/id_tag_manager.c
   )
 
 find_package (Threads)
