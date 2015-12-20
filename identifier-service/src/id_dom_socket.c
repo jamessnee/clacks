@@ -1,5 +1,6 @@
 #include "clacks_common.h"
 #include "id_generator.h"
+#include "id_tag_manager.h"
 #include <errno.h>
 #include <syslog.h>
 #include <sys/types.h>
@@ -26,6 +27,49 @@ int send_uuid(int sock_con) {
   return rtn;
 }
 
+/* Tagging process
+ * server -> 1 -> client
+ * server <- uuid <- client
+ * server -> 1 -> client
+ * server <- derrived <- client
+ */
+void handle_tag_operation(int sock_con) {
+  int rtn;
+  char uuid[37];
+  char derrived[128];
+  int continue_command = 1;
+
+  // server -> 1 -> client
+  rtn = write(sock_con, &continue_command, sizeof(int));
+  if (rtn < 0) {
+    syslog(LOG_INFO, "clacksidd: Error writing to Client during tagging: %d", errno);
+    return;
+  }
+
+  // server <- uuid <- client
+  rtn = read(sock_con, uuid, 37);
+  if (rtn < 0) {
+    syslog(LOG_INFO, "clacksidd: Error reading UUID from Client during tagging: %d", errno);
+    return;
+  }
+
+  // server -> 1 -> client
+  rtn = write(sock_con, &continue_command, sizeof(int));
+  if (rtn < 0) {
+    syslog(LOG_INFO, "clacksidd: Error writing to Client during tagging: %d", errno);
+    return;
+  }
+
+  // server <- derrived <- client
+  rtn = read(sock_con, derrived, 128);
+  if (rtn < 0) {
+    syslog(LOG_INFO, "clacksidd: Error reading derrived from Client during tagging: %d", errno);
+    return;
+  }
+
+  tag_id(uuid, derrived);
+}
+
 void handle_connection(int sock_con) {
   int read_val, ret;
   char buf[1024];
@@ -36,7 +80,7 @@ void handle_connection(int sock_con) {
       syslog(LOG_ERR, "Problem sending UUID: %d", errno);
     }
   } else if (strcmp(buf, CL_ID_TAG) == 0) {
-    syslog(LOG_INFO, "Got a TAG message");
+    handle_tag_operation(sock_con);
   }
 }
 
