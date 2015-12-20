@@ -18,9 +18,12 @@ void parse_message(char *buf) {
 
 int send_uuid(int sock_con) {
   char uuid[37];
+  int rtn;
 
   next_uuid(uuid);
-  return write(sock_con, uuid, sizeof(uuid));
+  rtn = write(sock_con, uuid, sizeof(uuid));
+  check_pool(); // Refresh the pool if necessary
+  return rtn;
 }
 
 void handle_connection(int sock_con) {

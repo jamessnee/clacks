@@ -7,5 +7,6 @@
 
 void update_uuid_pool(void);
 void next_uuid(char *);
+void check_pool(void);
 
 #endif

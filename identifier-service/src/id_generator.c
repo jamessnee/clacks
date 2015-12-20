@@ -15,10 +15,12 @@ void update_uuid_pool(void) {
 }
 
 void next_uuid(char *out) {
+  uuid_unparse(uuid_list[uuid_list_hd], out);
+  uuid_list_hd--;
+}
+
+void check_pool(void) {
   if (uuid_list_hd == -1) {
     update_uuid_pool();
   }
-
-  uuid_unparse(uuid_list[uuid_list_hd], out);
-  uuid_list_hd--;
 }
