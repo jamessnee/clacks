@@ -1,5 +1,6 @@
 message TraceMessage {
   required string act_id=1;
   required string msg=2;
-  required int32 flags=3;
+  required uint64 ts_origin=3;
+  required int32 flags=4;
 }
