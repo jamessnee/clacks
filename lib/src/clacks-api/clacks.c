@@ -6,8 +6,18 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "clacks.h"
+
+/* Helpers */
+static inline long long read_time(void) {
+  long long us;
+  struct timespec time;
+  clock_gettime(CLOCK_MONOTONIC, &time);
+  us = (time.tv_sec * 1000000) + (time.tv_nsec / 1000);
+  return us;
+}
 
 /* API Back-End */
 void _clacks_trace_id_string(char *id, char *str, va_list args) {
@@ -20,6 +30,7 @@ void _clacks_trace_id_string(char *id, char *str, va_list args) {
     TraceMessage t_msg = TRACE_MESSAGE__INIT;
     t_msg.act_id = id;
     t_msg.msg = msg;
+    t_msg.ts_origin = read_time();
     t_msg.flags = 0;
 
     ret = send_trace_message(&t_msg);

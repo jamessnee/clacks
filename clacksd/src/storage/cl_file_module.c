@@ -27,7 +27,7 @@ int _store_trace_message(TraceMessage *msg) {
   us = (time.tv_sec * 1000000) + (time.tv_nsec / 1000);
 
   // Construct the output
-  rtn = asprintf(&to_write, "%lld||%s||%s\n", us, msg->act_id, msg->msg);
+  rtn = asprintf(&to_write, "%lld||%lu||%s||%s\n", us, msg->ts_origin, msg->act_id, msg->msg);
   if (rtn < 0)
     return rtn;
 
