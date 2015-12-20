@@ -64,3 +64,6 @@ int clacks_new_id(char *id) {
   return get_new_id(id);
 }
 
+void clacks_tag_id(char *cl_id, char *derrived) {
+  cl_id_tag_id(cl_id, derrived);
+}
