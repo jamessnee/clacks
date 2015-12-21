@@ -38,6 +38,19 @@ void _clacks_trace_id_string(char *id, char *str, va_list args) {
   free(msg);
 }
 
+void _clacks_join_id(char *id, char *j_id) {
+  int ret;
+
+  // Prepare the Join
+  TraceMessage t_msg = TRACE_MESSAGE__INIT;
+  t_msg.act_id = id;
+  t_msg.join_id = j_id;
+  t_msg.ts_origin = read_time();
+  t_msg.flags = 0;
+
+  ret = send_trace_message(&t_msg);
+}
+
 /* API Front-End */
 void clacks_trace_string(char *str, ...) {
   if (str != NULL) {
@@ -66,4 +79,10 @@ int clacks_new_id(char *id) {
 
 void clacks_tag_id(char *cl_id, char *derrived) {
   cl_id_tag_id(cl_id, derrived);
+}
+
+void clacks_join_id(char *id, char *j_id) {
+  if (id && j_id) {
+    _clacks_join_id(id, j_id);
+  }
 }

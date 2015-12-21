@@ -12,5 +12,6 @@
  *   -1 - On error
  */
 int store_trace_message(TraceMessage *msg);
+int store_join_message(TraceMessage *msg);
 
 #endif

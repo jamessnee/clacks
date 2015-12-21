@@ -118,4 +118,7 @@ void cl_id_tag_id(char *cl_id, char *derrived) {
     dom_sock = -1;
   }
 
+  close(dom_sock);
+  dom_sock = -1;
+
 }

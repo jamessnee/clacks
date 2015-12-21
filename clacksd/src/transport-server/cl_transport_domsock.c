@@ -38,9 +38,18 @@ void handle_message(const unsigned char *rd_buf, size_t size) {
 
   // Message seems to be good
   //syslog(LOG_INFO, "clacks_transport_dom: received: ID: %s :: %s", t_msg->act_id, t_msg->msg);
-  rtn = store_trace_message(t_msg);
-  if (rtn < 0) {
-    syslog(LOG_INFO, "clacks_tranport_dom: error storing trace message: %s", strerror(errno));
+
+  // Decide what kind of message it is {TRACE, JOIN}
+  if (t_msg->join_id) { // This is a  JOIN message
+    rtn = store_join_message(t_msg);
+    if (rtn < 0) {
+      syslog(LOG_INFO, "clacks_transport_dom: error storing join message: %s", strerror(errno));
+    }
+  } else { // This is a TRACE message
+    rtn = store_trace_message(t_msg);
+    if (rtn < 0) {
+      syslog(LOG_INFO, "clacks_tranport_dom: error storing trace message: %s", strerror(errno));
+    }
   }
 
   trace_message__free_unpacked(t_msg, NULL);

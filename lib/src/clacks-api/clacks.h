@@ -15,5 +15,6 @@ void clacks_trace_string(char *, ...);
 void clacks_trace_id_string(char *, char *, ...);
 
 void clacks_tag_id(char *id, char *derrived);
+void clacks_join_id(char *id, char *j_id);
 
 #endif
